@@ -236,9 +236,10 @@ void enterAgeInit()
   
   tft.print("DEL");
 }
-void 
+ 
 void enterage()
 {   
+  int flag = 0;
   int button_state = 0;
   int display_cursor = 150;
   tft.setCursor(25,25);
@@ -330,6 +331,18 @@ void enterage()
          tft.setCursor(display_cursor,25);
          tft.print("0");
     }
+    if((TouchX>175 && TouchX<195) && (TouchY>100 && TouchY<105))
+        {
+          tft.setCursor(240, 200);
+          tft.setTextColor(darkBlue, Blue);
+          tft.print("DEL");
+          if(!(display_cursor=display_cursor == 150))
+          {
+            display_cursor = display_cursor - 12;
+            flag = 1;
+          }
+          delay(100);
+         }
     //check for okay being pressed
     else if((TouchX>130 && TouchX<140) && (TouchY>100 && TouchY<105))
     {
@@ -339,13 +352,14 @@ void enterage()
       tft.print("OK");
       BeginWorkoutInit();
       state = BEGINWORKOUT;
-    }
-    if (button_state == 1)
+    }s
+
+    if (button_state == 1 && flag == 0)
         {
           display_cursor = display_cursor +12;
-          switch (ButtonPressedMainMenu){
+          /*switch (ButtonPressedMainMenu){
             case 1: 
-            
+            */
           }
                 
                 
@@ -354,8 +368,9 @@ void enterage()
           TouchX = 0;
           TouchY = 0;
         }
+     
   }
-}
+
 
 void BeginWorkout()
 {
