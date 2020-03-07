@@ -25,16 +25,21 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 uint16_t white = tft.color565(255, 255, 255);
 uint16_t Blue = tft.color565(90, 0, 0);
-uint16_t darkBlue = tft.color565(255, 0, 0);
+uint16_t darkBlue = tft.color565(0, 90, 45);
 
-enum StateNames {MENU, INSTRUCTIONS, BEGINWORKOUT, INWORKOUT, ENDWORKOUT, ENTERINGAGE};
+enum StateNames {MENU, INSTRUCTIONS, BEGINWORKOUT, INWORKOUT, ENDWORKOUT, ENTERINGAGE, ENTERINGHEIGHT, ENTERINGWEIGHT, ENTERINGSEX};
 StateNames state = MENU;
 
 int ButtonPressedMainMenu = 0;
 int counter = 0;
 int TouchX = 0;
 int TouchY = 0;
-char string [5];
+String age_string = String("") ;
+String height_string = String("");
+String weight_string = String("");
+bool height_unit_flag = 0;
+byte sex_flag = -1;
+
 void setup(void) {
   init();
   tft.begin();
@@ -45,7 +50,7 @@ void setup(void) {
 }
 
 
-void loop(void) {
+/*void loop(void) {
  TSPoint p = ts.getPoint();
  if (p.z > ts.pressureThreshhold) {
     Serial.print("\nOriginal X = "); Serial.print(p.x);
@@ -67,7 +72,7 @@ else if((TouchX>100 && TouchX<137) && (TouchY>140 && TouchY<145))
 }
  delay(100);
 } 
-
+*/
 void menuinit()
 {
   tft.fillScreen(Blue);
@@ -111,12 +116,58 @@ void BeginWorkoutInit()
 
   tft.setCursor(25, 25);
   tft.print("Enter Age: ");
+
+  if(age_string.length() != 0)
+  {
+    tft.setCursor(145,25);
+    tft.print(age_string);
+  }
  
   tft.setCursor(25, 50);
   tft.print("Enter Height: ");
-
+  if(height_string.length()!=0)
+  {
+    if(height_unit_flag == 0)
+    {
+      tft.fillRect(220, 50, 25, 20, darkBlue);
+      tft.setCursor(220,50);
+      tft.print("CM");
+      tft.setCursor(180,50);
+      tft.print(height_string);
+    }
+    else if(height_unit_flag == 1)
+    {
+      tft.fillRect(220,50, 25, 20, darkBlue);
+      tft.setCursor(220,50);
+      tft.print("INCHES");
+      tft.setCursor(180,50);
+      tft.print(height_string);
+    }
+  }
+  
   tft.setCursor(25, 75);
   tft.print("Enter Weight:  ");
+  if(weight_string.length()!=0)
+  {
+    tft.setCursor(180,75);
+    tft.print(weight_string);
+  }
+
+  tft.setCursor(25,100);
+  tft.print("Enter Sex: ");
+  if(sex_flag == 0)
+  {
+    tft.fillRect(165,100, 25, 20, darkBlue);
+    tft.setCursor(165,100);
+    tft.print("Female");
+  }
+  else if(sex_flag == 1)
+  {
+    tft.fillRect(165,100, 25, 20, darkBlue);   
+    tft.setCursor(165,100);
+    tft.print("Male");
+  }
+  
 
   tft.setCursor(140, 125 );
   tft.print("OK");
@@ -183,7 +234,353 @@ void ins()
     }
   }
 }
-void enterAgeInit()
+
+ //age entering function
+void enterage()
+{   
+  bool delete_flag = 0;
+  int button_state = 0;
+  int display_cursor = 150;
+  int string_index = -1;
+  tft.setCursor(25,25);
+  tft.print("Enter Age: ");
+  while (state != BEGINWORKOUT){
+  TSPoint p = ts.getPoint();
+  if (p.z > ts.pressureThreshhold)
+  {
+    TouchX = map(p.y, TS_MINX, TS_MAXX, 0, tft.width());
+    TouchY = map(p.x, TS_MINY, TS_MAXY, 0, tft.height());
+  }
+    if ((TouchX > 143 && TouchX < 155) && (TouchY > 120 && TouchY < 124))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 1;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      age_string.concat('1');
+      tft.print("1");
+    }
+    else if ((TouchX > 158 && TouchX < 166) && (TouchY > 120 && TouchY < 124))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 2;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("2");
+      age_string.concat('2');
+    }
+    else if ((TouchX > 170 && TouchX < 178) && (TouchY > 120 && TouchY < 124))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 3;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("3");
+      age_string.concat('3');
+    }
+    else if ((TouchX > 140 && TouchX < 155) && (TouchY > 112 && TouchY < 117))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 4;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("4");
+      age_string.concat('4');
+    }
+    else if ((TouchX > 155 && TouchX < 166) && (TouchY > 110 && TouchY < 119))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 5;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("5");
+      age_string.concat('5');
+    }
+    else if ((TouchX > 168 && TouchX < 179) && (TouchY > 110 && TouchY < 118))
+    {
+      delay(200);
+      
+        string_index++;       
+   
+      ButtonPressedMainMenu = 6;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("6");
+      age_string.concat('6');
+
+    }
+    else if ((TouchX > 140 && TouchX < 155) && (TouchY > 105 && TouchY < 110))
+    {
+      delay(200);
+      
+        string_index++;       
+      ButtonPressedMainMenu = 7;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("7");
+      age_string.concat('7');
+    }
+    else if ((TouchX > 155 && TouchX < 165) && (TouchY > 105 && TouchY < 110))
+    {
+      delay(200);
+      
+        string_index++;  
+      
+      ButtonPressedMainMenu = 8;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("8");
+      age_string.concat('8');
+    }
+    else if ((TouchX > 168 && TouchX < 180) && (TouchY > 105 && TouchY < 110))
+    {
+      delay(200);
+      string_index++;       
+      ButtonPressedMainMenu = 9;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("9");
+      age_string.concat('9');
+    }
+    else if ((TouchX > 155 && TouchX < 169) && (TouchY > 100 && TouchY < 105))
+    {
+      delay(200);
+      string_index++;        
+      ButtonPressedMainMenu = 0;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("0");
+      age_string.concat('0');
+    }
+    else if ((TouchX > 130 && TouchX < 140) && (TouchY > 100 && TouchY < 105))
+    {
+      //ok pressed
+      tft.setTextColor(darkBlue, Blue);
+      tft.setCursor(45, 200);
+      delay(100);
+      Serial.print("\n");
+      Serial.print("OK Pressed");
+     break;
+    }
+    else if ((TouchX > 175 && TouchX < 195) && (TouchY > 100 && TouchY < 105))
+    {
+      delete_flag = 1;
+      Serial.print("\n");
+      Serial.print("DEL Pressed");
+      delay(100);
+      display_cursor = display_cursor - 12;
+      if (display_cursor < 150)
+      {
+        display_cursor = 155;
+      }
+      tft.setCursor(display_cursor, 25);                 
+      tft.fillRect(display_cursor - 12, 20, 25, 20, darkBlue);
+      age_string.remove(0,string_index+1); 
+      string_index = 0;
+    }
+
+    if (button_state == 1)
+    {
+      display_cursor = display_cursor + 15;
+      button_state = 0;
+      TouchX = 0;
+      TouchY = 0;
+    }
+    Serial.print("\n");
+    Serial.print(age_string);
+     
+        }
+        state = BEGINWORKOUT;
+        BeginWorkoutInit();
+        
+        
+     
+  }
+
+
+void BeginWorkout()
+{
+  TSPoint p = ts.getPoint();
+  if (p.z > ts.pressureThreshhold) 
+  {
+    TouchX = map(p.y, TS_MINX, TS_MAXX, 0, tft.width());
+    TouchY = map(p.x, TS_MINY, TS_MAXY, 0, tft.height());
+    //check for back being pressed
+    if((TouchX>125 && TouchX<142) && (TouchY>100 && TouchY<105))
+    {
+      tft.setTextColor(darkBlue, Blue);
+      tft.setCursor(25, 200);
+      tft.print("BACK");
+
+      delay(500);
+
+      menuinit();
+      state = MENU;
+    }
+    //check if enter age is pressed
+    if((TouchX>125 && TouchX<160) && (TouchY>125 && TouchY<128))
+    {
+      tft.setTextColor(darkBlue, Blue);
+      tft.setCursor(25, 25);
+      tft.print("Enter Age: ");
+      keypad_init();
+      state = ENTERINGAGE;
+      
+    }
+    //check if enter age is pressed
+    if((TouchX>128 && TouchX<164) && (TouchY>121 && TouchY<124))
+    {
+      tft.setTextColor(darkBlue,Blue);
+      tft.setCursor(25,50);
+      tft.print("Enter Height: ");
+      state = ENTERINGHEIGHT;
+      keypad_init();
+       
+    }
+    //check if enter weight is pressed
+    if((TouchX>128 && TouchX<164) &&  (TouchY>118 && TouchY<121))
+    {
+      tft.setTextColor(darkBlue,Blue);
+      tft.setCursor(25,75);
+      tft.print("Enter Weight: ");
+      keypad_init();
+      state = ENTERINGWEIGHT;
+    }
+    //check if enter sex is pressed
+    if((TouchX>129 && TouchX<156) && (TouchY>115 && TouchY<117))
+    {
+      tft.setTextColor(darkBlue,Blue);
+      tft.setCursor(25,100);
+      tft.print("Enter Sex: ");
+      enterSexInit();
+      state = ENTERINGSEX;
+    }
+    //check if ok is pressed
+    if(TouchX> && TouchX<) && (TouchY> && TouchY< ))
+    {
+      tft.setTextColor(darkBlue,Blue);
+      tft.SetCursor();
+      tft.print("OK");
+      inWorkoutinit();
+      state = INWORKOUT;
+    }
+    
+    
+  }
+}
+void inWorkoutinit()
+{
+  
+}
+
+void inWorkout()
+{
+  
+}
+
+void enterSexInit()
+{
+  tft.fillScreen(darkBlue);
+  tft.setTextColor(white);
+  tft.setTextSize(2);
+  tft.setCursor(100,75);
+  tft.print("Male");
+  tft.setCursor(175,75);
+  tft.print("Female");
+  tft.setCursor(145, 125 );
+  tft.print("OK");
+  tft.setCursor(125, 200);
+  tft.print("DELETE");
+}
+
+void enterSex()
+{
+  tft.setCursor(25,25);
+  tft.print("Enter Sex: ");
+  while(state!=BEGINWORKOUT)
+  {
+    TSPoint p = ts.getPoint();
+    if (p.z > ts.pressureThreshhold)
+  {
+    TouchX = map(p.y, TS_MINX, TS_MAXX, 0, tft.width());
+    TouchY = map(p.x, TS_MINY, TS_MAXY, 0, tft.height());
+  }
+  //check if male is pressed
+  if((TouchX>147 &&TouchX<158) && (TouchY>118 && TouchY<120))
+  {
+    delay(200);
+    sex_flag = 1;     //toggle sex_flag to 1 when male entered
+    tft.fillRect(150, 20, 50, 20, darkBlue);
+    tft.setCursor(150,25);
+    tft.print("Male");
+  }
+  //check if female is pressed
+  else if((TouchX>166 && TouchX<183 ) && (TouchY>118 &&TouchY<121))
+  {
+    delay(200);
+    sex_flag = 0;  //by default sex selected will be female
+    tft.fillRect(150, 20, 50, 20, darkBlue);
+    tft.setCursor(150,25);
+    tft.print("Female");
+  }
+  //check if ok is pressed
+  else if((TouchX>158 && TouchX<161) && (TouchY>112 && TouchY<114))
+  {
+    
+    tft.setTextColor(darkBlue, Blue);
+    tft.setCursor(145, 125 );
+    tft.print("OK");
+    
+    break;
+  }
+  //check if delete is pressed
+  else if((TouchX>153 && TouchX<172 ) && (TouchY>102 && TouchY<105))
+  {
+     tft.fillRect(150, 20, 45, 20, darkBlue);
+     sex_flag = -1;   
+  }
+  
+  }
+  state = BEGINWORKOUT;
+  BeginWorkoutInit();
+}
+
+void keypad_init()
 {
   tft.fillScreen(darkBlue);
   tft.setTextColor(white, darkBlue);
@@ -235,15 +632,26 @@ void enterAgeInit()
   tft.setCursor(240, 200);
   
   tft.print("DEL");
+
+  if(state == ENTERINGHEIGHT)
+  {
+    tft.setCursor(250,55);
+    tft.print("CM");
+    tft.setCursor(240,105);
+    tft.print("INCHES");
+  }
+  
 }
- 
-void enterage()
-{   
-  int flag = 0;
+void enterweight()
+{
+  
+  bool delete_flag = 0;
   int button_state = 0;
-  int display_cursor = 150;
+  int display_cursor = 180;
+  int string_index = -1;
+   weight_string.remove(0,string_index+1);
   tft.setCursor(25,25);
-  tft.print("Enter Age: ");
+  tft.print("Enter Weight: ");
   while (state != BEGINWORKOUT){
   TSPoint p = ts.getPoint();
   if (p.z > ts.pressureThreshhold)
@@ -251,158 +659,421 @@ void enterage()
     TouchX = map(p.y, TS_MINX, TS_MAXX, 0, tft.width());
     TouchY = map(p.x, TS_MINY, TS_MAXY, 0, tft.height());
   }
-    if((TouchX>143 && TouchX<155) && (TouchY>120 && TouchY<124))
-     { 
-         delay(200);
-         ButtonPressedMainMenu = 1;
-         button_state = 1;
-         tft.setCursor(display_cursor,25);
-         tft.print("1");
-     }
-    else if((TouchX>158 && TouchX<166) && (TouchY>120 && TouchY<124))
+    if ((TouchX > 143 && TouchX < 155) && (TouchY > 120 && TouchY < 124))
     {
-         delay(200);
-         ButtonPressedMainMenu = 2;
-         button_state = 1;
-         tft.setCursor(display_cursor,25);
-         tft.print("2");
-    }
-    else if((TouchX>170 && TouchX<178) && (TouchY>120 && TouchY<124))
-    {
-         delay(200);
-         ButtonPressedMainMenu = 3;
-         button_state = 1;
-         tft.setCursor(display_cursor,25);
-         tft.print("3");
-    }
-    else if((TouchX>140 && TouchX<155) && (TouchY>112 && TouchY<117))
-    {
-         delay(200);
-         ButtonPressedMainMenu = 4;
-         button_state = 1;
-         tft.setCursor(display_cursor,25);
-         tft.print("4");
-    }
-    else if((TouchX>155 && TouchX<166) && (TouchY>110 && TouchY<119))
-    {
-         delay(200);
-         ButtonPressedMainMenu = 5;
-         button_state = 1;
-         tft.setCursor(display_cursor,25);
-         tft.print("5");
-    }
-    else if((TouchX>168 && TouchX<179) && (TouchY>110 && TouchY<118))
-    {
-     delay(200);
-         ButtonPressedMainMenu = 6;
-         button_state = 1;
-         tft.setCursor(display_cursor,25);
-         tft.print("6");
-    }
-    else if((TouchX>140 && TouchX<155) && (TouchY>105 && TouchY<110))
-    {
-         delay(200);
-         ButtonPressedMainMenu = 7;
-         button_state = 1;
-         tft.setCursor(display_cursor,25);
-         tft.print("7");
-    }
-    else if((TouchX>155 && TouchX<165) && (TouchY>105 && TouchY<110))
-    {
-         delay(200);
-         ButtonPressedMainMenu = 8;
-         button_state = 1;
-         tft.setCursor(display_cursor,25);
-         tft.print("8");
-    }
-    else if((TouchX>168 && TouchX<180) && (TouchY>105 && TouchY<110))
-    {
-         delay(200);
-         ButtonPressedMainMenu = 9;
-         button_state = 1;
-         tft.setCursor(display_cursor,25);
-         tft.print("9");
-    }
-    else if((TouchX>155 && TouchX<169) && (TouchY>100 && TouchY<105))
-    {
-         delay(200);
-         ButtonPressedMainMenu = 0;
-         button_state = 1;
-         tft.setCursor(display_cursor,25);
-         tft.print("0");
-    }
-    if((TouchX>175 && TouchX<195) && (TouchY>100 && TouchY<105))
-        {
-          tft.setCursor(240, 200);
-          tft.setTextColor(darkBlue, Blue);
-          tft.print("DEL");
-          if(!(display_cursor=display_cursor == 150))
-          {
-            display_cursor = display_cursor - 12;
-            flag = 1;
-          }
-          delay(100);
-         }
-    //check for okay being pressed
-    else if((TouchX>130 && TouchX<140) && (TouchY>100 && TouchY<105))
-    {
+      delay(200);
       
-      tft.setCursor(45, 200);
-      tft.setTextColor(darkBlue, Blue); 
-      tft.print("OK");
-      BeginWorkoutInit();
-      state = BEGINWORKOUT;
-    }s
+        string_index++;       
+      
+      ButtonPressedMainMenu = 1;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      weight_string.concat('1');
+      tft.print("1");
+    }
+    else if ((TouchX > 158 && TouchX < 166) && (TouchY > 120 && TouchY < 124))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 2;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("2");
+      weight_string.concat('2');
+    }
+    else if ((TouchX > 170 && TouchX < 178) && (TouchY > 120 && TouchY < 124))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 3;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("3");
+      weight_string.concat('3');
+    }
+    else if ((TouchX > 140 && TouchX < 155) && (TouchY > 112 && TouchY < 117))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 4;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("4");
+      weight_string.concat('4');
+    }
+    else if ((TouchX > 155 && TouchX < 166) && (TouchY > 110 && TouchY < 119))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 5;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("5");
+      weight_string.concat('5');
+    }
+    else if ((TouchX > 168 && TouchX < 179) && (TouchY > 110 && TouchY < 118))
+    {
+      delay(200);
+      
+        string_index++;       
+   
+      ButtonPressedMainMenu = 6;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("6");
+      weight_string.concat('6');
 
-    if (button_state == 1 && flag == 0)
-        {
-          display_cursor = display_cursor +12;
-          /*switch (ButtonPressedMainMenu){
-            case 1: 
-            */
-          }
-                
-                
-          
-          button_state = 0;
-          TouchX = 0;
-          TouchY = 0;
+    }
+    else if ((TouchX > 140 && TouchX < 155) && (TouchY > 105 && TouchY < 110))
+    {
+      delay(200);
+      
+        string_index++;       
+      ButtonPressedMainMenu = 7;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("7");
+      weight_string.concat('7');
+    }
+    else if ((TouchX > 155 && TouchX < 165) && (TouchY > 105 && TouchY < 110))
+    {
+      delay(200);
+      
+        string_index++;  
+      
+      ButtonPressedMainMenu = 8;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("8");
+      weight_string.concat('8');
+    }
+    else if ((TouchX > 168 && TouchX < 180) && (TouchY > 105 && TouchY < 110))
+    {
+      delay(200);
+      string_index++;       
+      ButtonPressedMainMenu = 9;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("9");
+      weight_string.concat('9');
+    }
+    else if ((TouchX > 155 && TouchX < 169) && (TouchY > 100 && TouchY < 105))
+    {
+      delay(200);
+      string_index++;        
+      ButtonPressedMainMenu = 0;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("0");
+      weight_string.concat('0');
+    }
+    else if ((TouchX > 130 && TouchX < 140) && (TouchY > 100 && TouchY < 105))
+    {
+      //ok pressed
+      tft.setTextColor(darkBlue, Blue);
+      tft.setCursor(45, 200);
+      delay(100);
+      Serial.print("\n");
+      Serial.print("OK Pressed");
+     break;
+    }
+    else if ((TouchX > 175 && TouchX < 195) && (TouchY > 100 && TouchY < 105))
+    {
+      delete_flag = 1;
+      Serial.print("\n");
+      Serial.print("DEL Pressed");
+      delay(100);
+      display_cursor = display_cursor - 12;
+      if (display_cursor < 180)
+      {
+        display_cursor = 185;
+      }
+      tft.setCursor(display_cursor, 25);                 
+      tft.fillRect(display_cursor - 10, 20, 25, 20, darkBlue);
+      
+      weight_string.remove(0,string_index+1); 
+      string_index = 0;
+    }
+
+    if (button_state == 1)
+    {
+      display_cursor = display_cursor + 15;
+      button_state = 0;
+      TouchX = 0;
+      TouchY = 0;
+    }
+    
+     
         }
+        state = BEGINWORKOUT;
+        BeginWorkoutInit();
+        
+        
      
   }
 
 
-void BeginWorkout()
+void enterheight()
 {
+  bool delete_flag = 0;
+  int button_state = 0;
+  int display_cursor = 180;
+  int string_index = -1;
+  height_string.remove(0,string_index+1); 
+  tft.setCursor(25,25);
+  tft.print("Enter Height: ");
+  while (state != BEGINWORKOUT){
   TSPoint p = ts.getPoint();
-  if (p.z > ts.pressureThreshhold) 
+  if (p.z > ts.pressureThreshhold)
   {
     TouchX = map(p.y, TS_MINX, TS_MAXX, 0, tft.width());
     TouchY = map(p.x, TS_MINY, TS_MAXY, 0, tft.height());
-    //check for back being pressed
-    if((TouchX>125 && TouchX<142) && (TouchY>100 && TouchY<105))
-    {
-      tft.setTextColor(darkBlue, Blue);
-      tft.setCursor(25, 200);
-      tft.print("BACK");
-
-      delay(500);
-
-      menuinit();
-      state = MENU;
-    }
-    //check if enter age is pressed
-    if((TouchX>125 && TouchX<160) && (TouchY>125 && TouchY<128))
-    {
-      tft.setTextColor(darkBlue, Blue);
-      tft.setCursor(25, 25);
-      tft.print("Enter Age: ");
-      enterAgeInit();
-      state = ENTERINGAGE;
-    }
-    
   }
+    if ((TouchX > 143 && TouchX < 155) && (TouchY > 120 && TouchY < 124))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 1;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      height_string.concat('1');
+      tft.print("1");
+    }
+    else if ((TouchX > 158 && TouchX < 166) && (TouchY > 120 && TouchY < 124))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 2;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("2");
+      height_string.concat('2');
+    }
+    else if ((TouchX > 170 && TouchX < 178) && (TouchY > 120 && TouchY < 124))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 3;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("3");
+      height_string.concat('3');
+    }
+    else if ((TouchX > 140 && TouchX < 155) && (TouchY > 112 && TouchY < 117))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 4;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("4");
+      height_string.concat('4');
+    }
+    else if ((TouchX > 155 && TouchX < 166) && (TouchY > 110 && TouchY < 119))
+    {
+      delay(200);
+      
+        string_index++;       
+      
+      ButtonPressedMainMenu = 5;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("5");
+      height_string.concat('5');
+    }
+    else if ((TouchX > 168 && TouchX < 179) && (TouchY > 110 && TouchY < 118))
+    {
+      delay(200);
+      
+        string_index++;       
+   
+      ButtonPressedMainMenu = 6;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("6");
+      height_string.concat('6');
+
+    }
+    else if ((TouchX > 140 && TouchX < 155) && (TouchY > 105 && TouchY < 110))
+    {
+      delay(200);
+      
+        string_index++;       
+      ButtonPressedMainMenu = 7;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("7");
+      height_string.concat('7');
+    }
+    else if ((TouchX > 155 && TouchX < 165) && (TouchY > 105 && TouchY < 110))
+    {
+      delay(200);
+      
+        string_index++;  
+      
+      ButtonPressedMainMenu = 8;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("8");
+      height_string.concat('8');
+    }
+    else if ((TouchX > 168 && TouchX < 180) && (TouchY > 105 && TouchY < 110))
+    {
+      delay(200);
+      string_index++;       
+      ButtonPressedMainMenu = 9;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("9");
+      height_string.concat('9');
+    }
+    else if ((TouchX > 155 && TouchX < 169) && (TouchY > 100 && TouchY < 105))
+    {
+      delay(200);
+      string_index++;        
+      ButtonPressedMainMenu = 0;
+      Serial.print("\n");
+      Serial.print(ButtonPressedMainMenu);
+      button_state = 1;
+      tft.setCursor(display_cursor, 25);
+      tft.print("0");
+      height_string.concat('0');
+    }
+     //centimeter pressed
+    else if((TouchX>187&&TouchX<189) && (TouchY>120&&TouchY<122))
+    {
+       tft.setTextColor(darkBlue, Blue);
+       tft.setCursor(250,55);
+       tft.print("CM");  
+       tft.setTextColor(white,white);
+       tft.setCursor(240,105);
+       tft.print("INCHES");
+       height_unit_flag = 0; //height_unit_flag will be later used to calculate the BMI, when value is 0, height is in cm.
+    }
+    //inches pressed
+    else if((TouchX>184 &&TouchX<199) && (TouchY>114 && TouchY<120))
+    {
+      tft.setTextColor(darkBlue, Blue);
+      tft.setCursor(240,105);
+      tft.print("INCHES");
+      tft.setTextColor(white,white);
+      tft.setCursor(250,55);
+       tft.print("CM");
+      height_unit_flag = 1;
+    }
+    else if ((TouchX > 130 && TouchX < 140) && (TouchY > 100 && TouchY < 105))
+    {
+      //ok pressed
+      tft.setTextColor(darkBlue, Blue);
+      tft.setCursor(45, 200);
+      delay(100);
+      Serial.print("\n");
+      Serial.print("OK Pressed");
+     break;
+    }
+    else if ((TouchX > 175 && TouchX < 195) && (TouchY > 100 && TouchY < 105))
+    {
+      delete_flag = 1;
+      Serial.print("\n");
+      Serial.print("DEL Pressed");
+      delay(100);
+      display_cursor = display_cursor - 12;
+      if (display_cursor < 180)
+      {
+        display_cursor = 185;
+      }
+      tft.setCursor(display_cursor, 25);                 
+      tft.fillRect(display_cursor - 10, 20, 25, 20, darkBlue);
+      
+      height_string.remove(0,string_index+1); 
+      string_index = 0;
+    }
+   
+
+    if (button_state == 1)
+    {
+      display_cursor = display_cursor + 15;
+      button_state = 0;
+      TouchX = 0;
+      TouchY = 0;
+    }
+    Serial.print("\n");
+    Serial.print(height_string);
+     
+        }
+        state = BEGINWORKOUT;
+        BeginWorkoutInit();
+        
+        
+     
+  }
+
+
+  
+
+
+
+
+
+void inWorkout()
+{
+  
 }
+
 
 
 int main()
@@ -427,6 +1098,25 @@ int main()
     {
       enterage();
     }
+    else if(state == ENTERINGHEIGHT)
+    {
+      enterheight();
+    }
+    else if(state == ENTERINGWEIGHT)
+    {
+      enterweight();
+    }
+    else if(state == ENTERINGSEX)
+    {
+      enterSex();
+    }
+    else if(state == INWORKOUT)
+    {
+      inWorkout();
+    }
+    
+    
+    
    /* else if (state == ENDWORKOUT)
     {
       exitWorkout();
